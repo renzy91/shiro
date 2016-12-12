@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+						http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+						http://www.springframework.org/schema/context
+						http://www.springframework.org/schema/context/spring-context-3.2.xsd
+						http://www.springframework.org/schema/tx 
+						http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
+						http://www.springframework.org/schema/aop
+						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd ">
+						
+
+	<!-- 配置shiroFilterFactoryBean -->
+	<bean id="shiroFilterFactoryBean" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+		<!-- 注入依赖安全管理器 -->
+		<property name="securityManager" ref="securityManager"/>
+		<!-- 配置默认登录页面的路径 -->
+		<property name="loginUrl" value="/login.jsp"/>
+		
+		
+<property name="filters">
+<util:map>
+<entry key="authc" value-ref="formAuthenticationFilter"/>
+<entry key="ssl" value-ref="sslFilter"/>
+</util:map>
+</property>	
+		
+		
+		<!-- 告知shiro哪些请求需要认证
+			注意:配置由小到大
+		 -->
+		<property name="filterChainDefinitions">
+			<value>
+			    /user/login =ssl,anon
+			    /user/imageCode = anon
+			    /main.jsp = anon
+			    /easyui/** = anon
+			    /index1.jsp = user <!-- 登陆或通过remberMe登陆 -->
+			    /** = authc
+			</value>
+		</property>
+	</bean>
+	
+
+
+<!-- 基于Form表单的身份验证过滤器 -->
+    <bean id="formAuthenticationFilter" class="org.apache.shiro.web.filter.authc.FormAuthenticationFilter">
+        <!-- <property name="usernameParam" value="username"/>
+        <property name="passwordParam" value="password"/>
+        <property name="rememberMeParam" value="rememberMe"/>
+        <property name="loginUrl" value="/login.jsp"/> -->
+    </bean>	
+<bean id="sslFilter" class="org.apache.shiro.web.filter.authz.SslFilter">
+<property name="port" value="8443"/>
+</bean>
+	
+	
+	<!-- 创建安全管理器DefaultWebSecurityManager -->
+	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+		<!-- 注入依赖realms -->
+		<property name="realms" >
+			<list>
+				<ref bean="userNameRealm"/>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- 创建凭证匹配器 -->
+	<bean id="credentialsMatcher" class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+		<!-- 密码加密方式 -->
+		<property name="hashAlgorithmName" value="md5"/>
+		<!-- 密码散列次数 -->
+		<property name="hashIterations" value="1024"/>
+	</bean>
+	
+	<!-- 创建realm 自定义realm -->
+	<bean id="userNameRealm" class="sun.shiro.realms.UserNameRealm">
+		<!-- 依赖凭证匹配器 -->
+		<property name="credentialsMatcher" ref="credentialsMatcher"/>
+		<!-- 依赖DAO -->
+		<property name="userDAO" ref="userDAO"/>
+	</bean>
+	
+	<!-- 配置缓存管理器 -->
+	<bean id="ehCacheManager" class="org.apache.shiro.cache.ehcache.EhCacheManager">
+		<property name="cacheManagerConfigFile" value="classpath:shiro-ehcache.xml"></property>
+	</bean>
+
+</beans>

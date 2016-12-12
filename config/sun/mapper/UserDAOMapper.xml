@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="sun.dao.UserDAO">
+	<resultMap type="user" id="userFieldMap">
+		<id column="id" property="id"/>
+		<collection property="roles" javaType="list" ofType="role" select="queryRolesByUserId" column="id" />
+	</resultMap>
+	
+	<resultMap type="role" id="roleFieldMap">
+		<id column="rid" property="id"/>
+		<collection property="permissions" javaType="list" ofType="permission" select="queryPermissionBYRoleId" column="rid" />
+	</resultMap>
+	
+	<select id="queryUser" parameterType="String" resultType="user">
+		select id,name,password,salt from t_user where name=#{name}
+	</select>
+	<select id="queryRolesByUserId" parameterType="String" resultMap="roleFieldMap">
+		select r.id as rid,r.name
+		from t_role r
+		left join t_user_role t
+		on r.id=t.roleid
+		where t.userid=#{id}
+	</select>
+	<select id="queryPermissionBYRoleId" parameterType="String" resultType="permission">
+		select p.id as pid,p.code,p.url
+		from t_permission p
+		left join t_role_permission t
+		on p.id=t.permissionid
+		where t.id=#{id}
+	</select>
+</mapper>
