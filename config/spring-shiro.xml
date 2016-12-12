@@ -3,6 +3,7 @@
 	xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans 
 						http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
@@ -11,7 +12,9 @@
 						http://www.springframework.org/schema/tx 
 						http://www.springframework.org/schema/tx/spring-tx-3.2.xsd
 						http://www.springframework.org/schema/aop
-						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd ">
+						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+						http://www.springframework.org/schema/util
+						http://www.springframework.org/schema/util/spring-util-3.2.xsd ">
 						
 
 	<!-- 配置shiroFilterFactoryBean -->
@@ -21,21 +24,20 @@
 		<!-- 配置默认登录页面的路径 -->
 		<property name="loginUrl" value="/login.jsp"/>
 		
-		
 <property name="filters">
 <util:map>
-<entry key="authc" value-ref="formAuthenticationFilter"/>
+<!-- <entry key="authc" value-ref="formAuthenticationFilter"/> -->
 <entry key="ssl" value-ref="sslFilter"/>
 </util:map>
-</property>	
-		
+</property>
 		
 		<!-- 告知shiro哪些请求需要认证
 			注意:配置由小到大
 		 -->
 		<property name="filterChainDefinitions">
 			<value>
-			    /user/login =ssl,anon
+				/login.jsp = ssl,authc
+			    /user/login =anon
 			    /user/imageCode = anon
 			    /main.jsp = anon
 			    /easyui/** = anon
@@ -44,21 +46,11 @@
 			</value>
 		</property>
 	</bean>
-	
 
-
-<!-- 基于Form表单的身份验证过滤器 -->
-    <bean id="formAuthenticationFilter" class="org.apache.shiro.web.filter.authc.FormAuthenticationFilter">
-        <!-- <property name="usernameParam" value="username"/>
-        <property name="passwordParam" value="password"/>
-        <property name="rememberMeParam" value="rememberMe"/>
-        <property name="loginUrl" value="/login.jsp"/> -->
-    </bean>	
 <bean id="sslFilter" class="org.apache.shiro.web.filter.authz.SslFilter">
 <property name="port" value="8443"/>
 </bean>
-	
-	
+
 	<!-- 创建安全管理器DefaultWebSecurityManager -->
 	<bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
 		<!-- 注入依赖realms -->

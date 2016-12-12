@@ -13,10 +13,9 @@
 						http://www.springframework.org/schema/aop
 						http://www.springframework.org/schema/aop/spring-aop-3.2.xsd ">
 						
-							
 	<!-- 引入数据库小配置文件 -->					
-	<context:property-placeholder location="classpath:db.properties"/>	
-				
+	<context:property-placeholder location="classpath:db.properties"/>
+							
 	<!-- 包扫描 -->
 	<context:component-scan base-package="sun">
 		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
@@ -28,14 +27,8 @@
 		<property name="url" value="${mysql.url}" />
 		<property name="username" value="${mysql.username}" />
 		<property name="password" value="${mysql.password}" />
-		<!-- 连接池相关配置 -->
-		<!-- 初始化连接数  -->
-		<property name="initialSize" value="10"/>
-		<!-- 最大活跃连接  >   初始化连接数 -->
-		<property name="maxActive" value="15"/>  
-		<!-- 最大等待时长  毫秒  -->
-		<property name="maxWait" value="2000"/>
 	</bean>
+	
 	<!-- 创建SqlSessionFactory -->
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<!-- 依赖于 dataSource -->
